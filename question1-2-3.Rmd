@@ -1,0 +1,81 @@
+#set working directory where the data file is stored
+#setwd("C:\Users\Chirag\Desktop\xyz")
+```{r warning=FALSE,message=FALSE}
+
+library("dplyr")
+library("ggplot2")
+
+```
+
+#for question number 2
+#1st part
+```{r}
+data1=read.csv("demon.csv")
+ques_2=subset(data1,age<100)
+ques_2=data1[complete.cases(data1),]
+ques_2$Urban=as.factor(ques_2$Urban)
+levels(ques_2$Urban)[levels(ques_2$Urban)=="FALSE"] <- "RURAL"
+levels(ques_2$Urban)[levels(ques_2$Urban)=="TRUE"] <- "URBAN"
+plot1=ggplot(ques_2,aes(Urban,monthly.income))
+plot1+geom_point()
+x=data.frame(ques_2$Urban,ques_2$monthly.income)
+stt=x %>% group_by(ques_2.Urban) %>% summarise_all(funs(mean(.,na.rm=TRUE)))
+
+```
+
+#number of people from urban area having more income than mean of the rural area
+```{r warning=FALSE,message=FALSE}
+
+library("plyr")
+comparison=subset(ques_2,Urban=="URBAN")
+count(comparison$monthly.income>stt$ques_2.monthly.income[1])  
+
+```
+
+#number of people from rural area having more income than mean of the urban area
+```{r}
+comparison2=subset(ques_2,Urban=="RURAL")
+count(comparison$monthly.income>stt$ques_2.monthly.income[2])
+detach("package:plyr")
+```
+
+
+
+#2nd part
+```{r}
+ques_2b=data1 %>% group_by(sex,Demonitisation) %>% summarize(count=n())
+print(ques_2b)
+pct=round(ques_2b$count/sum(ques_2b$count)*100)
+label1=paste(ques_2b$sex,ques_2b$Demonitisation)
+label2=paste(pct,"%",sep=" ")
+pie(ques_2b$count,labels = label2,col=rainbow(2*length(ques_2b)),main = "pie chart for demonitisation")
+legend("bottomright",legend=label1,fill=rainbow(2*length(ques_2b)))
+
+```
+
+
+#for question number 4
+#1st part
+```{r}
+ques_2=subset(data1,age<100)
+ques_4=subset(ques_2,age>10)
+ques_4$age_group <- ifelse(ques_4$age > 50,"3", ifelse(ques_4$age>30,"2","1"))
+a=table(ques_4$sex,ques_4$Residence,ques_4$age_group)
+x=round((a[2, ,]/a[1, ,]),2)
+print(x)
+
+```
+
+
+#2nd part
+```{r}
+state=ques_4 %>% group_by(Residence,Demonitisation)%>% summarize(count=n())
+print(state)
+ggplot(state,aes(x=Residence,y=count,fill=factor(Demonitisation)))+
+     geom_bar(stat="identity",position="dodge")+
+     xlab("Residence")+ylab("Number of people")+
+     theme(legend.position="top",axis.text.x = element_text(angle=90, hjust=1))+
+     scale_fill_discrete(name="Demonitisation")
+
+```
+
